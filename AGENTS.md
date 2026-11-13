@@ -22,6 +22,7 @@ Build a simple backend that lets the app:
 ## Recommended stack
 
 - Runtime: Node.js 20+
+- Express 4.x (async route handlers must forward/catch rejected promises; Express 5 behavior differs)
 - Framework: Express
 - Database: PostgreSQL on Railway
 - ORM: Prisma
@@ -159,7 +160,7 @@ All webhooks must use HTTPS and validate the `X-Twilio-Signature` header.
 
 - Never expose the Twilio Auth Token to the frontend.
 - Require an API key for all app API routes.
-- Validate every Twilio webhook using `X-Twilio-Signature`.
+- Validate every Twilio webhook using `X-Twilio-Signature` and the configured public HTTPS URL.
 - Normalize phone numbers to E.164 before saving or sending.
 - Use HTTPS only.
 - Rate-limit outbound calls and messages.
