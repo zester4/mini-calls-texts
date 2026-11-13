@@ -90,6 +90,10 @@ Inbound and outbound calls are bridged to `FORWARD_CALL_TO`. Without it, inbound
 
 Do not mark production setup complete until the Railway database, environment variables, deployed health check, and real Twilio flows have all been verified.
 
+## Dependency compatibility
+
+The current compatibility target is Express 4.x, Prisma 6.x, and Twilio Node 5.x. The implementation uses the documented Express 4 async error-handling model and the Twilio Node `validateRequest` API. Express 5 and Prisma 7 are separate major-version migrations and have not been applied in this v1 build. This repository currently has no committed `package-lock.json`; generate and commit one from a registry-enabled build environment, then switch CI/deploy installs to `npm ci` for reproducible dependency resolution before production rollout.
+
 ## Development checks
 
 ```bash
