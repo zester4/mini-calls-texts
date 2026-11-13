@@ -4,7 +4,7 @@
   "description": "Calls-and-texts backend using Twilio",
   "main": "src/server.js",
   "type": "module",
-  "engines": { "node": ">=20" },
+  "engines": { "node": ">=22.11.0 <23" },
   "scripts": {
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",

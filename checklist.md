@@ -6,7 +6,7 @@ Source of truth: `plan.md`, `Todo.md`, and `AGENTS.md`
 > Check items only after implementation and relevant verification. Production/account tasks stay unchecked until verified in the real services.
 
 ## 1. Project foundation
-- [x] Confirm Node 20 runtime, package scripts/dependencies, and Railway build/start configuration
+- [x] Confirm Node 22.11+ runtime, package scripts/dependencies, and Railway build/start configuration
 - [x] Validate production environment variables and fail safely on missing configuration
 - [x] Add shared Prisma client and graceful process shutdown
 - [x] Keep secrets and local artifacts excluded from Git
@@ -55,6 +55,7 @@ Source of truth: `plan.md`, `Todo.md`, and `AGENTS.md`
 - [x] Cover phone normalization, payload validation, API auth, production config, Twilio signatures, and status updates
 - [x] Cover call/SMS success/failure, inbound persistence, and rate limits with mocked providers
 - [x] Run Prisma validation, client generation, and migration against PostgreSQL
+- [x] Context7 review: Twilio Node SDK `validateRequest`, Express 4 middleware/error-handling behavior, and Prisma production migration workflow
 - [x] Add CI workflow for install, audit, migrations, and tests
 
 ## 9. Documentation and deployment readiness
@@ -64,6 +65,8 @@ Source of truth: `plan.md`, `Todo.md`, and `AGENTS.md`
 - [x] Update `plan.md` to match the implemented call bridge and routes
 - [x] Link `Todo.md` to this progress checklist
 - [x] Verify backend v1 work that can be tested without production credentials
+- [x] Fix Express 4 readiness handler so PostgreSQL failures return HTTP 503
+- [x] Add tests for readiness success and database failure
 
 ## 10. External actions requiring account access
 - [ ] Confirm the correct Railway account/workspace and Mini Calls & Texts project. The connected Railway account currently shows no matching project, so no existing service was changed.
@@ -75,10 +78,20 @@ Source of truth: `plan.md`, `Todo.md`, and `AGENTS.md`
 - [ ] Perform real inbound/outbound call and SMS tests
 - [ ] Connect the actual frontend and verify end-to-end flows
 
+## Post-v1 maintenance follow-ups (not required for initial feature acceptance)
+- [ ] Generate and commit `package-lock.json` from a registry-enabled environment; switch CI and deployment installs to `npm ci`.
+- [ ] Plan and test separate major-version migrations for Express 5 and Prisma 7 before upgrading; current implementation targets Express 4 and Prisma 6.
+
 ## Progress log
 - 2026-11-13 — Inspected repository. The task list is `Todo.md` (capital T); source scaffold and placeholder tests were present.
 - 2026-11-13 — Implemented the v1 backend, schema/migration, Twilio webhooks, security, tests, CI, Railway configuration, README, and plan updates on `feat/complete-v1-backend`.
 - 2026-11-13 — Final automated CI passed: 27 tests, 0 failures; PostgreSQL migration applied successfully; Prisma validation and generation passed; dependency audit reported 0 vulnerabilities.
 - 2026-11-13 — Verified the connected Railway account has no Mini Calls & Texts project. No production deployment or existing Railway service was changed.
 - 2026-11-13 — GitGuardian initially flagged a test-only CI password. The workflow now uses a per-run value and the feature branch history was cleaned; GitGuardian reports no secrets detected.
-- 2026-11-13 — Pull request #1 is open and ready for review; it is not merged to `main`.
+- 2026-11-13 — PR #1 merged to `main` (merge commit `f634e841ce04e6f7cbc31c2904f6213179286a7c`).
+- 2026-11-13 — Context7 review confirmed the implementation uses supported Twilio Node `validateRequest` APIs; custom validation uses the configured public URL and account SID check. Express 4 docs highlighted async error handling: readiness handler now catches database errors and returns 503, with regression tests.
+- 2026-11-13 — Railway docs confirm Config as Code is deprecated; new services cannot use `railway.json`, with hard cutoff 2026-12-01 for existing services. README now documents dashboard settings or migration to `.railway/railway.ts` IaC.
+- 2026-11-13 — Follow-up branch `fix/readiness-check-and-railway-docs` contains the readiness fix, regression tests, and documentation updates.
+- 2026-11-13 — Follow-up CI passed: 29 tests, 0 failures; PostgreSQL migration applied; Prisma validation/generation passed; npm audit reported 0 vulnerabilities; GitGuardian scan passed.
+- 2026-11-13 — Runtime audit found Node 20 reached end-of-life on 2026-04-30. Updated the project engine constraint to `>=22.11.0 <23`, CI to Node 22, and all runtime docs to Node 22.11+.
+- 2026-11-13 — Final Node 22 CI passed: 29 tests, 0 failures; Prisma validation/generation passed; PostgreSQL migration applied; npm audit reported 0 vulnerabilities; GitGuardian passed.
