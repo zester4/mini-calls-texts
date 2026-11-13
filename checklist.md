@@ -78,6 +78,10 @@ Source of truth: `plan.md`, `Todo.md`, and `AGENTS.md`
 - [ ] Perform real inbound/outbound call and SMS tests
 - [ ] Connect the actual frontend and verify end-to-end flows
 
+## Post-v1 maintenance follow-ups (not required for initial feature acceptance)
+- [ ] Generate and commit `package-lock.json` from a registry-enabled environment; switch CI and deployment installs to `npm ci`.
+- [ ] Plan and test separate major-version migrations for Express 5 and Prisma 7 before upgrading; current implementation targets Express 4 and Prisma 6.
+
 ## Progress log
 - 2026-11-13 — Inspected repository. The task list is `Todo.md` (capital T); source scaffold and placeholder tests were present.
 - 2026-11-13 — Implemented the v1 backend, schema/migration, Twilio webhooks, security, tests, CI, Railway configuration, README, and plan updates on `feat/complete-v1-backend`.
