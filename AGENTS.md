@@ -31,56 +31,44 @@ Build a simple backend that lets the app:
 - Auth: Simple API key (`x-api-key` header)
 - Deployment: Railway web service
 
-Railway automatically provides the `PORT` environment variable.
+Railway automatically provides the `PORT` environment variable. `railway.json` is retained for legacy existing services only; new Railway services must use dashboard settings or `.railway/railway.ts` Infrastructure as Code.
 
 ## Project structure
 
 ```text
 mini-calls-texts/
-├── plan.md
-├── package.json
+├── .github/workflows/ci.yml
 ├── .env.example
-├── .gitignore
+├── AGENTS.md
 ├── README.md
-├── railway.json
+├── Todo.md
+├── checklist.md
+├── package.json
+├── plan.md
+├── railway.json                 # legacy Config as Code; not for new services
 ├── prisma/
-│   └── schema.prisma
+│   ├── schema.prisma
+│   └── migrations/
 ├── src/
-│   ├── server.js
 │   ├── app.js
-│   ├── config/
-│   │   └── env.js
-│   ├── lib/
-│   │   ├── twilio.js
-│   │   ├── phone.js
-│   │   └── webhook.js
-│   ├── middleware/
-│   │   ├── apiKey.js
-│   │   ├── errorHandler.js
-│   │   └── validate.js
-│   ├── routes/
-│   │   ├── index.js
-│   │   ├── health.routes.js
-│   │   ├── calls.routes.js
-│   │   ├── messages.routes.js
-│   │   └── twilio.routes.js
+│   ├── server.js
+│   ├── config/env.js
 │   ├── controllers/
-│   │   ├── calls.controller.js
-│   │   ├── messages.controller.js
-│   │   └── twilio.controller.js
+│   ├── lib/                     # Prisma, Twilio, phone, webhook
+│   ├── middleware/              # API key, rate limits, validation, errors
+│   ├── routes/
 │   ├── services/
-│   │   ├── calls.service.js
-│   │   ├── messages.service.js
-│   │   └── contacts.service.js
-│   ├── validators/
-│   │   ├── call.schema.js
-│   │   └── message.schema.js
-│   └── utils/
-│       ├── logger.js
-│       └── response.js
+│   ├── utils/
+│   └── validators/
 └── tests/
+    ├── api.test.js
+    ├── call-service.test.js
     ├── calls.test.js
-    └── messages.test.js
+    ├── env.test.js
+    ├── message-service.test.js
+    ├── messages.test.js
+    ├── phone.test.js
+    └── webhook.test.js
 ```
 
 ## Environment variables
