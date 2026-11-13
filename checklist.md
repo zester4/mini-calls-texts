@@ -80,4 +80,5 @@ Source of truth: `plan.md`, `Todo.md`, and `AGENTS.md`
 - 2026-11-13 — Implemented the v1 backend, schema/migration, Twilio webhooks, security, tests, CI, Railway configuration, README, and plan updates on `feat/complete-v1-backend`.
 - 2026-11-13 — Final automated CI passed: 27 tests, 0 failures; PostgreSQL migration applied successfully; Prisma validation and generation passed; dependency audit reported 0 vulnerabilities.
 - 2026-11-13 — Verified the connected Railway account has no Mini Calls & Texts project. No production deployment or existing Railway service was changed.
-- 2026-11-13 — Changes are in a draft pull request for review; not merged to `main`.
+- 2026-11-13 — GitGuardian initially flagged a test-only CI password. The workflow now uses a per-run value and the feature branch history was cleaned; GitGuardian reports no secrets detected.
+- 2026-11-13 — Pull request #1 is open and ready for review; it is not merged to `main`.
