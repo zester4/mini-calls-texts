@@ -7,6 +7,16 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum CallDirection {
+  inbound
+  outbound
+}
+
+enum MessageDirection {
+  inbound
+  outbound
+}
+
 model Contact {
   id        String   @id @default(uuid())
   name      String?
@@ -15,24 +25,36 @@ model Contact {
 }
 
 model Call {
-  id             String    @id @default(uuid())
-  direction      String    // outbound or inbound
-  fromNumber     String
-  toNumber       String
-  status         String
-  twilioCallSid  String?   @unique
-  startedAt      DateTime?
-  endedAt        DateTime?
-  createdAt      DateTime  @default(now())
+  id              String        @id @default(uuid())
+  direction       CallDirection
+  fromNumber      String
+  toNumber        String
+  status          String
+  twilioCallSid   String?       @unique
+  startedAt       DateTime?
+  endedAt         DateTime?
+  createdAt       DateTime      @default(now())
+  statusUpdatedAt DateTime?
+  errorCode       String?
+
+  @@index([createdAt])
+  @@index([direction, status])
 }
 
 model Message {
-  id               String   @id @default(uuid())
-  direction        String   // outbound or inbound
+  id               String          @id @default(uuid())
+  direction        MessageDirection
   fromNumber       String
   toNumber         String
   body             String
   status           String
-  twilioMessageSid String?  @unique
-  createdAt        DateTime @default(now())
+  twilioMessageSid String?         @unique
+  createdAt        DateTime        @default(now())
+  statusUpdatedAt  DateTime?
+  errorCode        String?
+
+  @@index([createdAt])
+  @@index([fromNumber])
+  @@index([toNumber])
+  @@index([direction, status])
 }

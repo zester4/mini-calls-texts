@@ -1,8 +1,12 @@
 import { test } from 'node:test';
-import assert from 'node:assert';
+import assert from 'node:assert/strict';
+import { createMessageSchema } from '../src/validators/message.schema.js';
 
-// Basic placeholder tests - expand with real integration tests later
+test('message requests validate destination and body', () => {
+  assert.deepEqual(createMessageSchema.parse({ to: '+44 7700 900123', body: 'Hello there' }), { to: '+447700900123', body: 'Hello there' });
+});
 
-test('placeholder', () => {
-  assert.ok(true);
+test('message requests reject empty or oversized bodies', () => {
+  assert.equal(createMessageSchema.safeParse({ to: '+14155552671', body: ' ' }).success, false);
+  assert.equal(createMessageSchema.safeParse({ to: '+14155552671', body: 'x'.repeat(1601) }).success, false);
 });
