@@ -93,4 +93,5 @@ Source of truth: `plan.md`, `Todo.md`, and `AGENTS.md`
 - 2026-11-13 — Railway docs confirm Config as Code is deprecated; new services cannot use `railway.json`, with hard cutoff 2026-12-01 for existing services. README now documents dashboard settings or migration to `.railway/railway.ts` IaC.
 - 2026-11-13 — Follow-up branch `fix/readiness-check-and-railway-docs` contains the readiness fix, regression tests, and documentation updates.
 - 2026-11-13 — Follow-up CI passed: 29 tests, 0 failures; PostgreSQL migration applied; Prisma validation/generation passed; npm audit reported 0 vulnerabilities; GitGuardian scan passed.
-- 2026-11-13 — Runtime audit found Node 20 reached end-of-life on 2026-04-30. Updated the project engine constraint and CI to Node 22 (Prisma 6 minimum Node 22.11); final verification on the updated runtime is pending.
+- 2026-11-13 — Runtime audit found Node 20 reached end-of-life on 2026-04-30. Updated the project engine constraint to `>=22.11.0 <23`, CI to Node 22, and all runtime docs to Node 22.11+.
+- 2026-11-13 — Final Node 22 CI passed: 29 tests, 0 failures; Prisma validation/generation passed; PostgreSQL migration applied; npm audit reported 0 vulnerabilities; GitGuardian passed.
