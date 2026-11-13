@@ -162,7 +162,12 @@ Optional in version 1, but useful for saving names.
 - Make inbound webhook persistence idempotent to tolerate provider retries.
 
 Twilio signs webhook requests with `X-Twilio-Signature`; the Node SDK provides
-`twilio.validateRequest()` for validating form-encoded webhook requests.
+`twilio.validateRequest()` for validating form-encoded webhook requests. The implementation
+uses the configured public HTTPS origin plus the original request path, avoiding trust in
+incoming Host headers. It also verifies the expected Twilio Account SID.
+
+The readiness endpoint catches database connection failures and returns HTTP 503 rather
+than leaving an asynchronous Express 4 request unresolved.
 
 ## Environment variables
 
