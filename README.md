@@ -4,7 +4,7 @@ A small Node.js API for placing and receiving phone calls and SMS through a Twil
 
 ## Requirements
 
-- Node.js 20+
+- Node.js 22.11+ (Node 22 LTS; Prisma 6 supported minimum)
 - PostgreSQL
 - A Twilio account and voice/SMS-capable number
 - A long random application API key
