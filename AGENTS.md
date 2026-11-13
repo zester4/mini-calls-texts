@@ -21,7 +21,7 @@ Build a simple backend that lets the app:
 
 ## Recommended stack
 
-- Runtime: Node.js 20+
+- Runtime: Node.js 22.11+ (Node 22 LTS; Node 20 is end-of-life)
 - Express 4.x (async route handlers must forward/catch rejected promises; Express 5 behavior differs)
 - Framework: Express
 - Database: PostgreSQL on Railway
