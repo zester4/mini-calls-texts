@@ -1,6 +1,6 @@
 # Implementation Checklist — Mini Calls & Texts v1
 
-Implementation branch: `feat/complete-v1-backend`
+Implementation status: v1 merged to `main`; follow-up fixes merged via PR #2
 Source of truth: `plan.md`, `Todo.md`, and `AGENTS.md`
 
 > Check items only after implementation and relevant verification. Production/account tasks stay unchecked until verified in the real services.
@@ -95,3 +95,4 @@ Source of truth: `plan.md`, `Todo.md`, and `AGENTS.md`
 - 2026-11-13 — Follow-up CI passed: 29 tests, 0 failures; PostgreSQL migration applied; Prisma validation/generation passed; npm audit reported 0 vulnerabilities; GitGuardian scan passed.
 - 2026-11-13 — Runtime audit found Node 20 reached end-of-life on 2026-04-30. Updated the project engine constraint to `>=22.11.0 <23`, CI to Node 22, and all runtime docs to Node 22.11+.
 - 2026-11-13 — Final Node 22 CI passed: 29 tests, 0 failures; Prisma validation/generation passed; PostgreSQL migration applied; npm audit reported 0 vulnerabilities; GitGuardian passed.
+- 2026-11-13 — PR #2 merged to `main` (merge commit `135859eb364174a70f59f9ac0ccafe1c53ac108b`). Main-branch CI also passed with 29 tests, 0 failures, Prisma validation/generation, PostgreSQL migration, and 0 npm audit vulnerabilities.
