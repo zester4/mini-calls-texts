@@ -1,5 +1,7 @@
 # Todo — Mini Calls & Texts Backend
 
+The implementation status is tracked in [checklist.md](./checklist.md). Keep this file as the original v1 build-order reference; only mark an item complete in the checklist after its implementation and verification have passed.
+
 ## Build order
 
 1. Initialize the Node.js project.

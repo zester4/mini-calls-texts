@@ -1,47 +1,80 @@
-import { PrismaClient } from '@prisma/client';
-import { client, phoneNumber } from '../lib/twilio.js';
+import { prisma } from '../lib/prisma.js';
+import { getTwilioClient, getTwilioPhoneNumber } from '../lib/twilio.js';
 import { normalizePhone } from '../lib/phone.js';
 import { env } from '../config/env.js';
+import { logger } from '../utils/logger.js';
 
-const prisma = new PrismaClient();
+const callStatuses = new Set(['queued', 'initiated', 'ringing', 'in-progress', 'completed', 'busy', 'failed', 'no-answer', 'canceled']);
 
-export async function startOutboundCall({ to }) {
-  const toNumber = normalizePhone(to);
-  if (!toNumber) throw new Error('Invalid phone number');
+export async function startOutboundCall({ to }, dependencies = {}) {
+  const db = dependencies.prisma ?? prisma;
+  const getClient = dependencies.getTwilioClient ?? getTwilioClient;
+  const getNumber = dependencies.getTwilioPhoneNumber ?? getTwilioPhoneNumber;
+  const fromNumber = getNumber();
+  const publicBaseUrl = dependencies.publicBaseUrl ?? env.PUBLIC_BASE_URL;
+  if (!publicBaseUrl) {
+    const error = new Error('PUBLIC_BASE_URL is not configured');
+    error.status = 503;
+    throw error;
+  }
 
-  const call = await prisma.call.create({
-    data: {
-      direction: 'outbound',
-      fromNumber: phoneNumber,
-      toNumber,
-      status: 'queued',
-    },
+  const record = await db.call.create({
+    data: { direction: 'outbound', fromNumber, toNumber: to, status: 'queued' },
   });
 
-  const twilioCall = await client.calls.create({
-    to: toNumber,
-    from: phoneNumber,
-    url: `${env.PUBLIC_BASE_URL}/api/twilio/voice`, // or a dedicated TwiML endpoint
-    statusCallback: `${env.PUBLIC_BASE_URL}/api/twilio/call-status`,
-  });
+  let providerCall;
+  try {
+    providerCall = await getClient().calls.create({
+      to, from: fromNumber,
+      url: `${publicBaseUrl}/api/twilio/outbound-voice`,
+      method: 'POST',
+      statusCallback: `${publicBaseUrl}/api/twilio/call-status`,
+      statusCallbackMethod: 'POST',
+      statusCallbackEvent: ['initiated', 'ringing', 'answered', 'completed'],
+    });
+  } catch (cause) {
+    await db.call.update({
+      where: { id: record.id },
+      data: { status: 'failed', endedAt: new Date(), statusUpdatedAt: new Date(), errorCode: cause.code ? String(cause.code) : null },
+    });
+    logger.error('outbound_call_failed', { callId: record.id, code: cause.code });
+    const error = new Error('Unable to start the call with the phone provider');
+    error.status = 502;
+    error.code = 'CALL_PROVIDER_ERROR';
+    throw error;
+  }
 
-  await prisma.call.update({
-    where: { id: call.id },
-    data: { twilioCallSid: twilioCall.sid, status: twilioCall.status },
+  return db.call.update({
+    where: { id: record.id },
+    data: { twilioCallSid: providerCall.sid, status: providerCall.status, statusUpdatedAt: new Date() },
   });
-
-  return call;
 }
 
-export async function listRecentCalls() {
-  return prisma.call.findMany({ orderBy: { createdAt: 'desc' }, take: 50 });
+export async function listRecentCalls({ limit = 50 } = {}, db = prisma) {
+  return db.call.findMany({ orderBy: { createdAt: 'desc' }, take: limit });
 }
 
-export async function updateCallStatus(body) {
-  const { CallSid, CallStatus } = body;
-  if (!CallSid) return;
-  await prisma.call.updateMany({
+export async function saveInboundCall(body, { prisma: db = prisma } = {}) {
+  const { CallSid, From, To, CallStatus = 'ringing', AccountSid } = body;
+  const fromNumber = normalizePhone(From);
+  const toNumber = normalizePhone(To);
+  if (!CallSid || !fromNumber || !toNumber) return;
+  if (env.TWILIO_ACCOUNT_SID && AccountSid !== env.TWILIO_ACCOUNT_SID) return;
+  return db.call.upsert({
     where: { twilioCallSid: CallSid },
-    data: { status: CallStatus },
+    update: { status: callStatuses.has(CallStatus) ? CallStatus : 'ringing', statusUpdatedAt: new Date() },
+    create: { direction: 'inbound', fromNumber, toNumber, status: callStatuses.has(CallStatus) ? CallStatus : 'ringing', twilioCallSid: CallSid, statusUpdatedAt: new Date() },
   });
+}
+
+export async function updateCallStatus(body, { prisma: db = prisma } = {}) {
+  const { CallSid, CallStatus, DialCallStatus, ErrorCode } = body;
+  const status = DialCallStatus || CallStatus;
+  if (!CallSid || !callStatuses.has(status)) return;
+  const now = new Date();
+  const data = { status, statusUpdatedAt: now };
+  if (status === 'in-progress') data.startedAt = now;
+  if (['completed', 'failed', 'busy', 'no-answer', 'canceled'].includes(status)) data.endedAt = now;
+  if (ErrorCode) data.errorCode = String(ErrorCode);
+  await db.call.updateMany({ where: { twilioCallSid: CallSid }, data });
 }
