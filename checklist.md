@@ -6,7 +6,7 @@ Source of truth: `plan.md`, `Todo.md`, and `AGENTS.md`
 > Check items only after implementation and relevant verification. Production/account tasks stay unchecked until verified in the real services.
 
 ## 1. Project foundation
-- [x] Confirm Node 20 runtime, package scripts/dependencies, and Railway build/start configuration
+- [x] Confirm Node 22.11+ runtime, package scripts/dependencies, and Railway build/start configuration
 - [x] Validate production environment variables and fail safely on missing configuration
 - [x] Add shared Prisma client and graceful process shutdown
 - [x] Keep secrets and local artifacts excluded from Git
@@ -93,3 +93,4 @@ Source of truth: `plan.md`, `Todo.md`, and `AGENTS.md`
 - 2026-11-13 — Railway docs confirm Config as Code is deprecated; new services cannot use `railway.json`, with hard cutoff 2026-12-01 for existing services. README now documents dashboard settings or migration to `.railway/railway.ts` IaC.
 - 2026-11-13 — Follow-up branch `fix/readiness-check-and-railway-docs` contains the readiness fix, regression tests, and documentation updates.
 - 2026-11-13 — Follow-up CI passed: 29 tests, 0 failures; PostgreSQL migration applied; Prisma validation/generation passed; npm audit reported 0 vulnerabilities; GitGuardian scan passed.
+- 2026-11-13 — Runtime audit found Node 20 reached end-of-life on 2026-04-30. Updated the project engine constraint and CI to Node 22 (Prisma 6 minimum Node 22.11); final verification on the updated runtime is pending.
