@@ -1,77 +1,83 @@
 # Implementation Checklist — Mini Calls & Texts v1
 
-Branch: `feat/complete-v1-backend`
+Implementation branch: `feat/complete-v1-backend`
 Source of truth: `plan.md`, `Todo.md`, and `AGENTS.md`
 
-> Items are checked only after implementation and the relevant verification have succeeded. External account/deployment steps are tracked separately and will not be marked complete without access and evidence.
+> Check items only after implementation and relevant verification. Production/account tasks stay unchecked until verified in the real services.
 
 ## 1. Project foundation
-- [ ] Confirm runtime, package scripts, dependencies, and Railway start/build configuration
-- [ ] Validate required environment variables and fail safely on missing production configuration
-- [ ] Add a shared Prisma client and graceful process shutdown
-- [ ] Ensure secrets and local artifacts remain excluded from Git
+- [x] Confirm Node 20 runtime, package scripts/dependencies, and Railway build/start configuration
+- [x] Validate production environment variables and fail safely on missing configuration
+- [x] Add shared Prisma client and graceful process shutdown
+- [x] Keep secrets and local artifacts excluded from Git
 
 ## 2. Data layer
-- [ ] Finalize Contact, Call, and Message models, enums, indexes, and uniqueness constraints
-- [ ] Add an initial Prisma migration and migration lock file
-- [ ] Add database readiness check and safe connection lifecycle
+- [x] Finalize Contact, Call, and Message models, direction enums, indexes, and uniqueness constraints
+- [x] Add initial Prisma migration and migration lock file
+- [x] Add database readiness check and shared connection lifecycle
 
 ## 3. Core API and security
-- [ ] Implement health/readiness endpoint
-- [ ] Require a configured API key using constant-time comparison
-- [ ] Validate request payloads and E.164 phone numbers
-- [ ] Add bounded pagination and safe message-thread lookup
-- [ ] Add outbound call/SMS rate limits
-- [ ] Add consistent error handling and redacted structured logging
+- [x] Implement liveness and database-readiness endpoints
+- [x] Require a configured API key using constant-time comparison
+- [x] Validate request payloads and international E.164 phone numbers
+- [x] Add bounded history queries and safe message-thread lookup
+- [x] Add outbound call/SMS rate limits
+- [x] Add consistent error handling and redacted structured logging
 
 ## 4. Outbound calls
-- [ ] Create a pending call record before contacting Twilio
-- [ ] Start the Twilio call with a dedicated outbound TwiML URL
-- [ ] Persist Twilio SID and status
-- [ ] Mark failed attempts safely and return an actionable API error
-- [ ] Expose recent call history
+- [x] Persist a queued call before contacting Twilio
+- [x] Start Twilio calls with dedicated outbound TwiML and a bridge destination
+- [x] Persist Twilio SID and provider status
+- [x] Mark provider failures safely and return actionable API errors
+- [x] Expose recent call history
 
 ## 5. Inbound calls and call status
-- [ ] Validate every Twilio webhook signature using the public webhook URL
-- [ ] Persist inbound calls idempotently
-- [ ] Return valid forwarding/rejection TwiML
-- [ ] Handle call status callbacks, timestamps, and unknown SIDs safely
-- [ ] Document Twilio Console webhook configuration
+- [x] Validate Twilio signatures against the configured public webhook URL
+- [x] Persist inbound calls idempotently and normalize phone numbers
+- [x] Return forwarding/rejection TwiML
+- [x] Handle call status/action callbacks and timestamps safely
+- [x] Document Twilio Console webhook configuration
 
 ## 6. Outbound SMS
-- [ ] Create queued message record before sending
-- [ ] Send SMS through Twilio with delivery callback
-- [ ] Persist SID/status and mark failed sends safely
-- [ ] Expose recent messages and per-number threads
+- [x] Persist queued messages before sending
+- [x] Send SMS through Twilio with delivery callbacks
+- [x] Persist provider SID/status and mark failed sends safely
+- [x] Expose recent messages and per-number threads
 
 ## 7. Inbound SMS and delivery status
-- [ ] Validate inbound SMS webhook signatures
-- [ ] Validate payload/account/phone fields and persist inbound messages idempotently
-- [ ] Acknowledge valid webhooks promptly
-- [ ] Handle delivery status callbacks and timestamps idempotently
+- [x] Validate inbound SMS webhook signatures and account SID
+- [x] Validate payload/phone fields and persist inbound messages idempotently
+- [x] Acknowledge valid webhooks with TwiML
+- [x] Handle delivery status callbacks idempotently
 
 ## 8. Tests and quality
-- [ ] Replace placeholder tests with meaningful unit/API tests
-- [ ] Cover phone normalization, validation, authentication, Twilio signatures, and status mapping
-- [ ] Cover call and SMS success/failure paths with mocked external services
-- [ ] Run test suite and Prisma validation/generation
-- [ ] Add CI workflow for install, Prisma validation, and tests
+- [x] Replace placeholder tests with meaningful unit/API tests
+- [x] Cover phone normalization, payload validation, API auth, production config, Twilio signatures, and status updates
+- [x] Cover call/SMS success/failure, inbound persistence, and rate limits with mocked providers
+- [x] Run Prisma validation, client generation, and migration against PostgreSQL
+- [x] Add CI workflow for install, audit, migrations, and tests
 
 ## 9. Documentation and deployment readiness
-- [ ] Update README with setup, API examples, environment variables, and Twilio configuration
-- [ ] Document Railway build/start/migration procedure and health checks
-- [ ] Document frontend API contract and error responses
-- [ ] Verify all v1 definition-of-done items that can be verified without production credentials
+- [x] Update README with setup, API examples, environment variables, and Twilio configuration
+- [x] Document Railway build/start/migration procedure and health checks
+- [x] Document frontend API contract, error responses, and API-key secrecy
+- [x] Update `plan.md` to match the implemented call bridge and routes
+- [x] Link `Todo.md` to this progress checklist
+- [x] Verify backend v1 work that can be tested without production credentials
 
 ## 10. External actions requiring account access
+- [ ] Confirm the correct Railway account/workspace and Mini Calls & Texts project. The connected Railway account currently shows no matching project, so no existing service was changed.
+- [ ] Confirm whether this is an existing Railway service or a new one. Railway Config as Code (`railway.json`) is deprecated: existing services can use it only until 2026-12-01, and new services must use Infrastructure as Code or dashboard settings.
 - [ ] Confirm Railway PostgreSQL service and production environment variables
-- [ ] Apply production database migration
-- [ ] Deploy the service to Railway and verify health
-- [ ] Configure Twilio number webhooks to the deployed HTTPS URLs
+- [ ] Apply the migration to the production database
+- [ ] Deploy to Railway and verify the live readiness endpoint
+- [ ] Configure the Twilio number's inbound voice and SMS webhook URLs
 - [ ] Perform real inbound/outbound call and SMS tests
-- [ ] Connect the frontend and verify end-to-end flows
+- [ ] Connect the actual frontend and verify end-to-end flows
 
 ## Progress log
-- Started: 2026-11-13
-- Initial inspection: existing source scaffold found; test files are placeholders; `Todo.md` exists with uppercase T.
-- No implementation item is marked complete until verified.
+- 2026-11-13 — Inspected repository. The task list is `Todo.md` (capital T); source scaffold and placeholder tests were present.
+- 2026-11-13 — Implemented the v1 backend, schema/migration, Twilio webhooks, security, tests, CI, Railway configuration, README, and plan updates on `feat/complete-v1-backend`.
+- 2026-11-13 — Final automated CI passed: 27 tests, 0 failures; PostgreSQL migration applied successfully; Prisma validation and generation passed; dependency audit reported 0 vulnerabilities.
+- 2026-11-13 — Verified the connected Railway account has no Mini Calls & Texts project. No production deployment or existing Railway service was changed.
+- 2026-11-13 — Changes are in a draft pull request for review; not merged to `main`.
