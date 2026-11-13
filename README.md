@@ -28,7 +28,8 @@ For local Twilio webhook testing, expose the service through an HTTPS tunnel and
 | `NODE_ENV` | No | `development`, `test`, or `production` |
 | `TWILIO_ACCOUNT_SID` | Yes for calls/SMS | Twilio Account SID |
 | `TWILIO_AUTH_TOKEN` | Yes for calls/SMS/webhooks | Twilio Auth Token; server-side only |
-| `TWILIO_PHONE_NUMBER` | Yes for calls/SMS | Your Twilio number in E.164 format |
+| `TWILIO_PHONE_NUMBER` | Yes for calls/SMS and voice caller ID | Your Twilio number in E.164 format; used as the SMS sender only when no Messaging Service SID is configured |
+| `TWILIO_MESSAGING_SERVICE_SID` | Optional, recommended for SMS sender pools | Twilio Messaging Service SID beginning with `MG`; when set, outbound SMS uses the service sender pool and omits the fixed `From` number |
 | `APP_API_KEY` | Yes | Random secret sent as the `x-api-key` header; use 32+ characters in production |
 | `PUBLIC_BASE_URL` | Yes for Twilio | Public HTTPS service origin, without a trailing path |
 | `FORWARD_CALL_TO` | Yes for two-way calls | Your phone in E.164 format; answered calls are bridged to this number |
@@ -60,6 +61,20 @@ curl -X POST "$PUBLIC_BASE_URL/api/messages" \
 ```
 
 Phone numbers must include an international country code (E.164). The API allows up to 10 outbound calls/hour and 60 outbound SMS/hour per source IP, per service instance. Responses use `{ "data": ... }` on success and `{ "error": ..., "code": ... }` on failure.
+
+
+## Twilio Messaging Service setup (recommended for outbound SMS)
+
+A Messaging Service is not a per-message Message SID. It is a reusable sender-pool/configuration resource whose SID begins with `MG`. Individual messages still receive their own `SM` Message SID.
+
+1. In Twilio Console, open **Messaging → Services** and create a Messaging Service for this application.
+2. Add the intended SMS-capable US sender number to the service Sender Pool. A number merely owned by the account is not automatically in this pool.
+3. For a US local 10DLC number, ensure the required A2P 10DLC Brand and Campaign are approved and the number is registered/associated with the campaign through the Messaging Service. For a US toll-free sender, complete the applicable toll-free verification instead.
+4. Copy the Messaging Service SID (`MG...`) into Railway as `TWILIO_MESSAGING_SERVICE_SID`.
+5. Keep `TWILIO_PHONE_NUMBER` configured for voice caller ID and as the legacy SMS fallback. Once the Messaging Service SID is present, outbound SMS requests use `messagingServiceSid` and omit `from`, allowing Twilio to select an eligible sender from the pool.
+6. Deploy the application and test an outbound SMS. Confirm the returned `SM...` Message SID and inspect the actual `from`, `messagingServiceSid`, status and error code in Twilio Console.
+
+The service does not bypass Messaging Geo Permissions, destination restrictions, carrier rules, A2P registration or toll-free verification. Error 21408 still needs to be resolved in the effective account SMS Geo Permissions. Error 21612 can be caused by an incompatible sender/recipient combination; a correctly configured sender pool lets Twilio select an eligible sender but does not guarantee delivery.
 
 ## Twilio Console configuration
 
