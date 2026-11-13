@@ -25,7 +25,7 @@ public HTTPS webhook endpoints, logs, and deployments.
 
 ## Tech stack
 
-- Node.js 20+
+- Node.js 22.11+
 - Express
 - Prisma
 - PostgreSQL
