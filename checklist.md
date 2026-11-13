@@ -87,4 +87,5 @@ Source of truth: `plan.md`, `Todo.md`, and `AGENTS.md`
 - 2026-11-13 — PR #1 merged to `main` (merge commit `f634e841ce04e6f7cbc31c2904f6213179286a7c`).
 - 2026-11-13 — Context7 review confirmed the implementation uses supported Twilio Node `validateRequest` APIs; custom validation uses the configured public URL and account SID check. Express 4 docs highlighted async error handling: readiness handler now catches database errors and returns 503, with regression tests.
 - 2026-11-13 — Railway docs confirm Config as Code is deprecated; new services cannot use `railway.json`, with hard cutoff 2026-12-01 for existing services. README now documents dashboard settings or migration to `.railway/railway.ts` IaC.
-- 2026-11-13 — Follow-up branch `fix/readiness-check-and-railway-docs` contains the readiness fix, regression tests, and documentation updates; CI verification pending.
+- 2026-11-13 — Follow-up branch `fix/readiness-check-and-railway-docs` contains the readiness fix, regression tests, and documentation updates.
+- 2026-11-13 — Follow-up CI passed: 29 tests, 0 failures; PostgreSQL migration applied; Prisma validation/generation passed; npm audit reported 0 vulnerabilities; GitGuardian scan passed.
