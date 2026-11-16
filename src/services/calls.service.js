@@ -50,6 +50,36 @@ export async function startOutboundCall({ to }, dependencies = {}) {
   });
 }
 
+/**
+ * Record an outbound call placed from the browser Voice SDK (TwiML App path).
+ */
+export async function recordBrowserOutboundCall({ to, from, callSid }, db = prisma) {
+  if (!to || !from) return null;
+  if (callSid) {
+    return db.call.upsert({
+      where: { twilioCallSid: callSid },
+      update: { status: 'initiated', statusUpdatedAt: new Date() },
+      create: {
+        direction: 'outbound',
+        fromNumber: from,
+        toNumber: to,
+        status: 'initiated',
+        twilioCallSid: callSid,
+        statusUpdatedAt: new Date(),
+      },
+    });
+  }
+  return db.call.create({
+    data: {
+      direction: 'outbound',
+      fromNumber: from,
+      toNumber: to,
+      status: 'initiated',
+      statusUpdatedAt: new Date(),
+    },
+  });
+}
+
 export async function listRecentCalls({ limit = 50 } = {}, db = prisma) {
   return db.call.findMany({ orderBy: { createdAt: 'desc' }, take: limit });
 }
