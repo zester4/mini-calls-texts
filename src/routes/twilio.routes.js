@@ -4,6 +4,7 @@ import * as twilioController from '../controllers/twilio.controller.js';
 const router = Router();
 router.post('/voice', twilioController.handleVoice);
 router.post('/outbound-voice', twilioController.handleOutboundVoice);
+router.post('/client-voice', twilioController.handleClientVoice);
 router.post('/call-status', twilioController.handleCallStatus);
 router.post('/sms', twilioController.handleSms);
 router.post('/message-status', twilioController.handleMessageStatus);
